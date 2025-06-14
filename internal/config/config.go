@@ -4,14 +4,14 @@ import (
 	"os"
 )
 
-// Config uygulama konfigürasyonunu temsil eder
+// Config represents application configuration
 type Config struct {
 	Port     string
 	Host     string
 	LogLevel string
 }
 
-// Load çevre değişkenlerinden veya varsayılan değerlerden konfigürasyon yükler
+// Load loads configuration from environment variables or default values
 func Load() *Config {
 	cfg := &Config{
 		Port:     getEnv("PORT", "8080"),
@@ -21,7 +21,7 @@ func Load() *Config {
 	return cfg
 }
 
-// getEnv çevre değişkenini alır, yoksa varsayılan değeri döner
+// getEnv gets environment variable, returns default value if not found
 func getEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value

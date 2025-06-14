@@ -9,28 +9,28 @@ import (
 	"gonder/pkg/audit"
 )
 
-// Handler HTTP handler'larını içerir
+// Handler contains HTTP handlers
 type Handler struct {
 	auditLogger *audit.Logger
 }
 
-// New yeni bir handler örneği oluşturur
+// New creates a new handler instance
 func New(auditLogger *audit.Logger) *Handler {
 	return &Handler{
 		auditLogger: auditLogger,
 	}
 }
 
-// Home ana sayfa handler'ı
+// Home is the homepage handler
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	html := `
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gonder - Sistem Log Toplama Servisi</title>
+    <title>Gonder - System Log Collection Service</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
         .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -59,82 +59,82 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 Gonder - Sistem Log Toplama Servisi</h1>
-            <p>Gerçek zamanlı sistem log toplama, parsing ve monitoring platformu</p>
+            <h1>🚀 Gonder - System Log Collection Service</h1>
+            <p>Real-time system log collection, parsing and monitoring platform</p>
         </div>
         
         <div class="grid">
             <div class="card">
-                <h3>📊 Log Toplama Özellikleri</h3>
+                <h3>📊 Log Collection Features</h3>
                 <ul class="feature-list">
-                    <li>Syslog toplama ve parsing</li>
-                    <li>Nginx/Apache access log'ları</li>
-                    <li>Docker container log'ları</li>
-                    <li>Authentication log'ları</li>
+                    <li>Syslog collection and parsing</li>
+                    <li>Nginx/Apache access logs</li>
+                    <li>Docker container logs</li>
+                    <li>Authentication logs</li>
                     <li>Real-time log monitoring</li>
                     <li>Structured JSON output</li>
-                    <li>Kritik log alerting</li>
+                    <li>Critical log alerting</li>
                 </ul>
             </div>
             
             <div class="card">
-                <h3>⚙️ Sistem Durumu</h3>
-                <p><span class="status-indicator status-active"></span><strong>Log Collector:</strong> Aktif</p>
-                <p><span class="status-indicator status-active"></span><strong>Audit Logger:</strong> Aktif</p>
-                <p><span class="status-indicator status-active"></span><strong>API Server:</strong> Çalışıyor</p>
+                <h3>⚙️ System Status</h3>
+                <p><span class="status-indicator status-active"></span><strong>Log Collector:</strong> Active</p>
+                <p><span class="status-indicator status-active"></span><strong>Audit Logger:</strong> Active</p>
+                <p><span class="status-indicator status-active"></span><strong>API Server:</strong> Running</p>
                 <br>
-                <a href="/api/logs/start" class="btn">Log Collector Başlat</a>
-                <a href="/api/logs/stop" class="btn btn-danger">Log Collector Durdur</a>
+                <a href="/api/logs/start" class="btn">Start Log Collector</a>
+                <a href="/api/logs/stop" class="btn btn-danger">Stop Log Collector</a>
             </div>
         </div>
 
         <h2>📋 API Endpoints</h2>
         
         <div class="endpoint">
-            <span class="method get">GET</span> <strong>/</strong> - Ana sayfa
+            <span class="method get">GET</span> <strong>/</strong> - Homepage
         </div>
         
         <div class="endpoint">
-            <span class="method get">GET</span> <strong>/api/logs/status</strong> - Log collector durumu
+            <span class="method get">GET</span> <strong>/api/logs/status</strong> - Log collector status
         </div>
         
         <div class="endpoint">
-            <span class="method get">GET</span> <strong>/api/logs/sources</strong> - Log kaynaklarını listele
+            <span class="method get">GET</span> <strong>/api/logs/sources</strong> - List log sources
         </div>
         
         <div class="endpoint">
-            <span class="method post">POST</span> <strong>/api/logs/start</strong> - Log collector'ı başlat
+            <span class="method post">POST</span> <strong>/api/logs/start</strong> - Start log collector
         </div>
         
         <div class="endpoint">
-            <span class="method post">POST</span> <strong>/api/logs/stop</strong> - Log collector'ı durdur
+            <span class="method post">POST</span> <strong>/api/logs/stop</strong> - Stop log collector
         </div>
         
         <div class="endpoint">
-            <span class="method get">GET</span> <strong>/api/health</strong> - Sistem sağlık kontrolü
+            <span class="method get">GET</span> <strong>/api/health</strong> - System health check
         </div>
 
-        <h2>🧪 Test Komutları</h2>
+        <h2>🧪 Test Commands</h2>
         <div class="card">
-            <h3>Log Collector Yönetimi</h3>
+            <h3>Log Collector Management</h3>
             <pre>
-# Log collector durumunu kontrol et
+# Check log collector status
 curl http://localhost:8080/api/logs/status
 
-# Log collector'ı başlat
+# Start log collector
 curl -X POST http://localhost:8080/api/logs/start
 
-# Log kaynaklarını listele
+# List log sources
 curl http://localhost:8080/api/logs/sources
 
-# Log collector'ı durdur
+# Stop log collector
 curl -X POST http://localhost:8080/api/logs/stop
             </pre>
         </div>
         
-        <h2>📈 Log Formatları</h2>
+        <h2>📈 Log Formats</h2>
         <div class="card">
-            <h3>Sistem Log Örneği</h3>
+            <h3>System Log Example</h3>
             <pre>[SYSTEM_LOG] {
   "id": "log_1749941868123456789",
   "timestamp": "2025-06-15T01:57:48+03:00",
@@ -156,10 +156,10 @@ curl -X POST http://localhost:8080/api/logs/stop
 }</pre>
         </div>
         
-        <h2>🎯 Desteklenen Log Kaynakları</h2>
+        <h2>🎯 Supported Log Sources</h2>
         <div class="grid">
             <div class="card">
-                <h3>Sistem Log'ları</h3>
+                <h3>System Logs</h3>
                 <ul>
                     <li>/var/log/syslog</li>
                     <li>/var/log/messages</li>
@@ -168,7 +168,7 @@ curl -X POST http://localhost:8080/api/logs/stop
                 </ul>
             </div>
             <div class="card">
-                <h3>Uygulama Log'ları</h3>
+                <h3>Application Logs</h3>
                 <ul>
                     <li>Nginx access/error log</li>
                     <li>Apache access/error log</li>
@@ -183,14 +183,14 @@ curl -X POST http://localhost:8080/api/logs/stop
 	fmt.Fprint(w, html)
 }
 
-// SendRequest mesaj gönderme isteği (eski)
+// SendRequest message sending request (legacy)
 type SendRequest struct {
 	Message   string `json:"message"`
 	Recipient string `json:"recipient"`
 	Type      string `json:"type,omitempty"` // email, sms, etc.
 }
 
-// SendResponse mesaj gönderme yanıtı (eski)
+// SendResponse message sending response (legacy)
 type SendResponse struct {
 	Success   bool   `json:"success"`
 	Message   string `json:"message"`
@@ -198,7 +198,7 @@ type SendResponse struct {
 	Timestamp string `json:"timestamp"`
 }
 
-// Send mesaj gönderme handler'ı (eski, backward compatibility için)
+// Send message sending handler (legacy, for backward compatibility)
 func (h *Handler) Send(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -207,17 +207,15 @@ func (h *Handler) Send(w http.ResponseWriter, r *http.Request) {
 
 	var req SendRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		// Hata audit log
+		// Error audit log
 		h.auditLogger.LogError(err, "JSON decode error in Send endpoint", map[string]interface{}{
-			"path":        r.URL.Path,
-			"method":      r.Method,
-			"remote_addr": r.RemoteAddr,
+			"request_body": r.Body,
 		})
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	// Basit validasyon
+	// Validation
 	if req.Message == "" {
 		h.auditLogger.LogError(fmt.Errorf("message field is empty"), "Validation error in Send endpoint", map[string]interface{}{
 			"request": req,
@@ -234,18 +232,17 @@ func (h *Handler) Send(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Mesaj tipi varsayılan
+	// Default message type
 	if req.Type == "" {
 		req.Type = "email"
 	}
 
-	// Mesaj ID oluştur
+	// Generate message ID
 	messageID := fmt.Sprintf("msg_%d", time.Now().Unix())
 
-	// Eski işlevsellik - artık log toplama odaklı olduğumuz için deprecated
-	fmt.Printf("📤 [DEPRECATED] Mesaj gönderiliyor: %s -> %s\n", req.Message, req.Recipient)
+	fmt.Printf("📤 [DEPRECATED] Sending message: %s -> %s\n", req.Message, req.Recipient)
 
-	// Mesaj gönderimi audit log
+	// Message sending audit log
 	h.auditLogger.LogMessageSent(req.Recipient, req.Type, messageID, true, map[string]interface{}{
 		"message_length": len(req.Message),
 		"message_preview": func() string {
@@ -254,13 +251,12 @@ func (h *Handler) Send(w http.ResponseWriter, r *http.Request) {
 			}
 			return req.Message
 		}(),
-		"deprecated": true,
-		"note":       "Bu endpoint artık deprecated. Sistem log toplama odaklı çalışıyoruz.",
+		"note": "This endpoint is now deprecated. We are focusing on system log collection.",
 	})
 
 	response := SendResponse{
 		Success:   true,
-		Message:   "Mesaj gönderildi (deprecated feature)",
+		Message:   "Message sent (deprecated feature)",
 		ID:        messageID,
 		Timestamp: time.Now().Format(time.RFC3339),
 	}
@@ -269,7 +265,7 @@ func (h *Handler) Send(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// HealthResponse sağlık kontrolü yanıtı
+// HealthResponse health check response
 type HealthResponse struct {
 	Status    string `json:"status"`
 	Timestamp string `json:"timestamp"`
@@ -278,12 +274,11 @@ type HealthResponse struct {
 	Purpose   string `json:"purpose"`
 }
 
-// Health sağlık kontrolü handler'ı
+// Health health check handler
 func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 	// Health check audit log
 	h.auditLogger.LogHealthCheck("healthy", map[string]interface{}{
-		"version":    "2.0.0",
-		"purpose":    "sistem_log_toplama",
+		"purpose":    "system_log_collection",
 		"check_time": time.Now().Format(time.RFC3339),
 	})
 
@@ -291,8 +286,8 @@ func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 		Status:    "healthy",
 		Timestamp: time.Now().Format(time.RFC3339),
 		Version:   "2.0.0",
-		Uptime:    "N/A", // Burada gerçek uptime hesaplanabilir
-		Purpose:   "Sistem Log Toplama Servisi",
+		Uptime:    "N/A",
+		Purpose:   "System Log Collection Service",
 	}
 
 	w.Header().Set("Content-Type", "application/json")

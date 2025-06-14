@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// EventType audit event türlerini tanımlar
+// EventType defines audit event types
 type EventType string
 
 const (
@@ -21,7 +21,7 @@ const (
 	EventTypeHealthCheck EventType = "health_check"
 )
 
-// AuditEvent sistem olaylarını temsil eder
+// AuditEvent represents system events
 type AuditEvent struct {
 	Timestamp  time.Time   `json:"timestamp"`
 	EventType  EventType   `json:"event_type"`
@@ -44,7 +44,7 @@ type Logger struct {
 	logger *log.Logger
 }
 
-// New yeni bir audit logger oluşturur
+// New creates a new audit logger
 func New() *Logger {
 	logger := log.New(os.Stdout, "[AUDIT] ", 0)
 	return &Logger{
@@ -52,24 +52,24 @@ func New() *Logger {
 	}
 }
 
-// LogEvent bir audit event'i loglar
+// LogEvent logs an audit event
 func (l *Logger) LogEvent(event AuditEvent) {
 	if event.Timestamp.IsZero() {
 		event.Timestamp = time.Now()
 	}
 
-	// JSON formatında serialize et
+	// Serialize to JSON format
 	jsonData, err := json.Marshal(event)
 	if err != nil {
 		l.logger.Printf("AUDIT LOG ERROR: %v", err)
 		return
 	}
 
-	// Console'a yaz
+	// Write to console
 	l.logger.Println(string(jsonData))
 }
 
-// LogAPICall API çağrısını loglar
+// LogAPICall logs API calls
 func (l *Logger) LogAPICall(r *http.Request, statusCode int, duration time.Duration, details interface{}) {
 	event := AuditEvent{
 		EventType:  EventTypeAPICall,
@@ -83,7 +83,7 @@ func (l *Logger) LogAPICall(r *http.Request, statusCode int, duration time.Durat
 		UserAgent:  r.UserAgent(),
 	}
 
-	// Query parameters varsa ekle
+	// Add query parameters if present
 	if r.URL.RawQuery != "" {
 		event.Details = map[string]interface{}{
 			"query_params": r.URL.RawQuery,
@@ -94,11 +94,11 @@ func (l *Logger) LogAPICall(r *http.Request, statusCode int, duration time.Durat
 	l.LogEvent(event)
 }
 
-// LogMessageSent mesaj gönderimi loglar
+// LogMessageSent logs message sending
 func (l *Logger) LogMessageSent(recipient, messageType, messageID string, success bool, details interface{}) {
-	message := fmt.Sprintf("Mesaj gönderildi: %s -> %s (ID: %s)", messageType, recipient, messageID)
+	message := fmt.Sprintf("Message sent: %s -> %s (ID: %s)", messageType, recipient, messageID)
 	if !success {
-		message = fmt.Sprintf("Mesaj gönderme başarısız: %s -> %s", messageType, recipient)
+		message = fmt.Sprintf("Message sending failed: %s -> %s", messageType, recipient)
 	}
 
 	event := AuditEvent{
@@ -116,7 +116,7 @@ func (l *Logger) LogMessageSent(recipient, messageType, messageID string, succes
 	l.LogEvent(event)
 }
 
-// LogError hata durumunu loglar
+// LogError logs error conditions
 func (l *Logger) LogError(err error, context string, details interface{}) {
 	event := AuditEvent{
 		EventType: EventTypeError,
@@ -128,18 +128,18 @@ func (l *Logger) LogError(err error, context string, details interface{}) {
 	l.LogEvent(event)
 }
 
-// LogStartup uygulama başlama durumunu loglar
+// LogStartup logs application startup
 func (l *Logger) LogStartup(port string, details interface{}) {
 	event := AuditEvent{
 		EventType: EventTypeStartup,
-		Message:   fmt.Sprintf("Gonder uygulaması başlatıldı - Port: %s", port),
+		Message:   fmt.Sprintf("Gonder application started - Port: %s", port),
 		Details:   details,
 	}
 
 	l.LogEvent(event)
 }
 
-// LogHealthCheck health check durumunu loglar
+// LogHealthCheck logs health check status
 func (l *Logger) LogHealthCheck(status string, details interface{}) {
 	event := AuditEvent{
 		EventType: EventTypeHealthCheck,

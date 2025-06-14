@@ -34,12 +34,12 @@ Gonder provides the following capabilities:
 ### 5. MVP Features
 
 #### 5.1 Core Features
-- **Audit Log Collection**: Sistem audit loglarını toplama
-- **Log Parsing**: Raw logları structured JSON'a dönüştürme
-- **Elasticsearch Integration**: Bulk insert işlemleri
-- **Configuration Management**: YAML/JSON config dosyası
-- **Error Handling**: Retry mekanizması ve error logging
-- **Health Check**: Uygulama durumu kontrolü
+- **Audit Log Collection**: Collecting system audit logs
+- **Log Parsing**: Converting raw logs to structured JSON
+- **Elasticsearch Integration**: Bulk insert operations
+- **Configuration Management**: YAML/JSON config file
+- **Error Handling**: Retry mechanism and error logging
+- **Health Check**: Application status monitoring
 
 #### 5.2 Supported Log Sources (MVP)
 - Linux: `/var/log/audit/audit.log`

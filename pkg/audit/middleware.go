@@ -5,61 +5,61 @@ import (
 	"time"
 )
 
-// ResponseWriter HTTP response'u yakalamak için wrapper
+// ResponseWriter wrapper to capture HTTP response
 type ResponseWriter struct {
 	http.ResponseWriter
 	statusCode int
 	written    int
 }
 
-// NewResponseWriter yeni bir ResponseWriter oluşturur
+// NewResponseWriter creates a new ResponseWriter
 func NewResponseWriter(w http.ResponseWriter) *ResponseWriter {
 	return &ResponseWriter{
 		ResponseWriter: w,
-		statusCode:     http.StatusOK, // varsayılan 200
+		statusCode:     http.StatusOK, // default 200
 	}
 }
 
-// WriteHeader status code'u yakalar
+// WriteHeader captures status code
 func (rw *ResponseWriter) WriteHeader(code int) {
 	rw.statusCode = code
 	rw.ResponseWriter.WriteHeader(code)
 }
 
-// Write data yazımını yakalar
+// Write captures data writing
 func (rw *ResponseWriter) Write(data []byte) (int, error) {
 	written, err := rw.ResponseWriter.Write(data)
 	rw.written += written
 	return written, err
 }
 
-// StatusCode yakalanan status code'u döner
+// StatusCode returns captured status code
 func (rw *ResponseWriter) StatusCode() int {
 	return rw.statusCode
 }
 
-// Middleware audit logging middleware'i
+// Middleware audit logging middleware
 func Middleware(auditLogger *Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
 
-			// Response writer'ı wrap et
+			// Wrap response writer
 			wrappedWriter := NewResponseWriter(w)
 
-			// Request'i işle
+			// Process request
 			next.ServeHTTP(wrappedWriter, r)
 
-			// Süreyi hesapla
+			// Calculate duration
 			duration := time.Since(start)
 
-			// API çağrısını logla
+			// Log API call
 			details := map[string]interface{}{
 				"content_length": r.ContentLength,
 				"bytes_written":  wrappedWriter.written,
 			}
 
-			// Content-Type varsa ekle
+			// Add Content-Type if present
 			if contentType := r.Header.Get("Content-Type"); contentType != "" {
 				details["content_type"] = contentType
 			}
@@ -69,27 +69,27 @@ func Middleware(auditLogger *Logger) func(http.Handler) http.Handler {
 	}
 }
 
-// MiddlewareFunc fonksiyon olarak middleware
+// MiddlewareFunc middleware as function
 func MiddlewareFunc(auditLogger *Logger, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
-		// Response writer'ı wrap et
+		// Wrap response writer
 		wrappedWriter := NewResponseWriter(w)
 
-		// Request'i işle
+		// Process request
 		next.ServeHTTP(wrappedWriter, r)
 
-		// Süreyi hesapla
+		// Calculate duration
 		duration := time.Since(start)
 
-		// API çağrısını logla
+		// Log API call
 		details := map[string]interface{}{
 			"content_length": r.ContentLength,
 			"bytes_written":  wrappedWriter.written,
 		}
 
-		// Content-Type varsa ekle
+		// Add Content-Type if present
 		if contentType := r.Header.Get("Content-Type"); contentType != "" {
 			details["content_type"] = contentType
 		}

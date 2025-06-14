@@ -15,15 +15,15 @@ import (
 )
 
 func main() {
-	fmt.Println("🚀 Gonder - Sistem Log Toplama Servisi başlatılıyor...")
+	fmt.Println("🚀 Gonder - System Log Collection Service starting...")
 
-	// Audit logger'ı başlat
+	// Start audit logger
 	auditLogger := audit.New()
 
-	// Konfigürasyon yükle
+	// Load configuration
 	cfg := config.Load()
 
-	// Log collector'ı başlat
+	// Start log collector
 	logCollector := collector.New(auditLogger)
 
 	// Startup audit log
@@ -31,9 +31,9 @@ func main() {
 		"host":      cfg.Host,
 		"log_level": cfg.LogLevel,
 		"version":   "2.0.0",
-		"purpose":   "sistem_log_toplama",
+		"purpose":   "system_log_collection",
 		"features": []string{
-			"sistem_log_toplama",
+			"system_log_collection",
 			"audit_logging",
 			"real_time_monitoring",
 			"log_parsing",
@@ -41,11 +41,11 @@ func main() {
 		},
 	})
 
-	// Handler'ları başlat
+	// Start handlers
 	h := handler.New(auditLogger)
 	logHandler := handler.NewLogHandler(logCollector)
 
-	// Routes tanımla - audit middleware ile wrap et
+	// Define routes - wrap with audit middleware
 	http.HandleFunc("/", audit.MiddlewareFunc(auditLogger, h.Home))
 	http.HandleFunc("/api/health", audit.MiddlewareFunc(auditLogger, h.Health))
 
@@ -58,49 +58,49 @@ func main() {
 	// Backward compatibility (deprecated)
 	http.HandleFunc("/api/send", audit.MiddlewareFunc(auditLogger, h.Send))
 
-	// Log collector'ı otomatik başlat
-	fmt.Println("🔧 Sistem log collector başlatılıyor...")
+	// Auto-start log collector
+	fmt.Println("🔧 Starting system log collector...")
 	if err := logCollector.Start(); err != nil {
-		auditLogger.LogError(err, "Log collector başlatma hatası", nil)
-		fmt.Printf("⚠️ Log collector başlatılamadı: %v\n", err)
+		auditLogger.LogError(err, "Log collector startup error", nil)
+		fmt.Printf("⚠️ Log collector could not be started: %v\n", err)
 	} else {
-		fmt.Println("✅ Sistem log collector başarıyla başlatıldı")
+		fmt.Println("✅ System log collector started successfully")
 	}
 
-	// Graceful shutdown için signal handler
+	// Signal handler for graceful shutdown
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		<-sigCh
-		fmt.Println("\n🛑 Shutdown sinyali alındı, temiz kapatma işlemi başlatılıyor...")
+		fmt.Println("\n🛑 Shutdown signal received, starting clean shutdown process...")
 
-		// Log collector'ı durdur
+		// Stop log collector
 		logCollector.Stop()
 
 		// Shutdown audit log
 		auditLogger.LogEvent(audit.AuditEvent{
 			EventType: "system_shutdown",
-			Message:   "Sistem temiz şekilde kapatılıyor",
+			Message:   "System is shutting down cleanly",
 		})
 
 		os.Exit(0)
 	}()
 
-	// Sunucuyu başlat
-	fmt.Printf("🌐 Sunucu %s portunda çalışıyor\n", cfg.Port)
+	// Start server
+	fmt.Printf("🌐 Server running on port %s\n", cfg.Port)
 	fmt.Println("📋 Endpoints:")
-	fmt.Println("  GET  /                    - Ana sayfa")
-	fmt.Println("  GET  /api/health          - Sistem sağlık kontrolü")
-	fmt.Println("  GET  /api/logs/status     - Log collector durumu")
-	fmt.Println("  GET  /api/logs/sources    - Log kaynaklarını listele")
-	fmt.Println("  POST /api/logs/start      - Log collector'ı başlat")
-	fmt.Println("  POST /api/logs/stop       - Log collector'ı durdur")
-	fmt.Println("  POST /api/send            - [DEPRECATED] Mesaj gönder")
-	fmt.Println("📊 Sistem log toplama aktif - Loglar console'a yazılıyor")
-	fmt.Println("🔍 Takip edilen log dosyaları:")
+	fmt.Println("  GET  /                    - Home page")
+	fmt.Println("  GET  /api/health          - System health check")
+	fmt.Println("  GET  /api/logs/status     - Log collector status")
+	fmt.Println("  GET  /api/logs/sources    - List log sources")
+	fmt.Println("  POST /api/logs/start      - Start log collector")
+	fmt.Println("  POST /api/logs/stop       - Stop log collector")
+	fmt.Println("  POST /api/send            - [DEPRECATED] Send message")
+	fmt.Println("📊 System log collection active - Logs are written to console")
+	fmt.Println("🔍 Monitored log files:")
 
-	// Aktif log kaynaklarını göster
+	// Show active log sources
 	sources := logCollector.GetSources()
 	for _, source := range sources {
 		if source.Enabled {

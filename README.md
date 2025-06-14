@@ -1,30 +1,30 @@
 # Gonder 🚀
 
-Gonder, modern Go ile yazılmış bir mesaj gönderme servisidir. Email, SMS ve diğer iletişim kanalları üzerinden mesaj gönderebilen esnek bir API sunar.
+Gonder is a modern messaging service written in Go. It provides a flexible API for sending messages via Email, SMS, and other communication channels.
 
-## ✨ Özellikler
+## ✨ Features
 
 - 🌐 RESTful API
-- 📊 **Comprehensive Audit Logging** - Tüm sistem olayları JSON formatında console'a yazılır
-- 📧 Email gönderme desteği (planlanan)
-- 📱 SMS gönderme desteği (planlanan)
-- 🔧 Kolay konfigürasyon
-- 🐳 Docker desteği (planlanan)
-- ⚡ Yüksek performans - Go 1.24.4
-- 🛡️ Error handling ve validation
+- 📊 **Comprehensive Audit Logging** - All system events are written to console in JSON format
+- 📧 Email sending support (planned)
+- 📱 SMS sending support (planned)
+- 🔧 Easy configuration
+- 🐳 Docker support (planned)
+- ⚡ High performance - Go 1.24.4
+- 🛡️ Error handling and validation
 
 ## 📊 Audit Logging
 
-Sistem **comprehensive audit logging** özelliği ile gelir:
+The system comes with **comprehensive audit logging** feature:
 
-### Loglanan Olaylar:
-- ✅ **API Calls** - Tüm HTTP istekleri (method, path, status, duration, IP, user-agent)
-- ✅ **Message Sent** - Mesaj gönderimi detayları (recipient, type, success/failure)
-- ✅ **Errors** - Sistem hataları ve validation hataları
-- ✅ **Startup/Shutdown** - Uygulama yaşam döngüsü
-- ✅ **Health Checks** - Sistem sağlık kontrolleri
+### Logged Events:
+- ✅ **API Calls** - All HTTP requests (method, path, status, duration, IP, user-agent)
+- ✅ **Message Sent** - Message sending details (recipient, type, success/failure)
+- ✅ **Errors** - System errors and validation errors
+- ✅ **Startup/Shutdown** - Application lifecycle
+- ✅ **Health Checks** - System health checks
 
-### Log Formatı:
+### Log Format:
 ```json
 {
   "timestamp": "2025-06-15T01:57:27.982286285+03:00",
@@ -40,48 +40,48 @@ Sistem **comprehensive audit logging** özelliği ile gelir:
 }
 ```
 
-## 🚀 Kurulum
+## 🚀 Installation
 
-### Gereksinimler
-- Go 1.24.4 veya üstü
+### Requirements
+- Go 1.24.4 or higher
 - Git
 
-### Çalıştırma
+### Running
 
 ```bash
-# Projeyi klonla
+# Clone the project
 git clone <repository-url>
 cd gonder
 
-# Bağımlılıkları yükle
+# Install dependencies
 go mod tidy
 
-# Uygulamayı çalıştır
+# Run the application
 go run cmd/gonder/main.go
 ```
 
 ### Environment Variables
 ```bash
-PORT=8080        # Sunucu portu (varsayılan: 8080)
-HOST=localhost   # Sunucu host (varsayılan: localhost) 
-LOG_LEVEL=info   # Log seviyesi (varsayılan: info)
+PORT=8080        # Server port (default: 8080)
+HOST=localhost   # Server host (default: localhost) 
+LOG_LEVEL=info   # Log level (default: info)
 ```
 
 ## 📋 API Endpoints
 
-### Ana Sayfa
+### Home Page
 ```
 GET /
 ```
-HTML ana sayfası
+HTML homepage
 
-### Mesaj Gönder
+### Send Message
 ```
 POST /api/send
 Content-Type: application/json
 
 {
-  "message": "Merhaba Dünya!",
+  "message": "Hello World!",
   "recipient": "user@example.com",
   "type": "email"
 }
@@ -91,13 +91,13 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "message": "Mesaj başarıyla gönderildi",
+  "message": "Message sent successfully",
   "id": "msg_1234567890",
   "timestamp": "2025-06-15T01:57:48+03:00"
 }
 ```
 
-### Sağlık Kontrolü
+### Health Check
 ```
 GET /api/health
 ```
@@ -112,66 +112,66 @@ GET /api/health
 }
 ```
 
-## 🏗️ Proje Yapısı
+## 🏗️ Project Structure
 
 ```
 gonder/
-├── cmd/gonder/main.go          # Ana uygulama
+├── cmd/gonder/main.go          # Main application
 ├── pkg/
-│   ├── audit/                  # Audit logging sistemi
-│   │   ├── audit.go           # Audit logger ve event types
+│   ├── audit/                  # Audit logging system
+│   │   ├── audit.go           # Audit logger and event types
 │   │   └── middleware.go      # HTTP middleware
-│   ├── handler/handler.go      # HTTP handler'ları
-│   └── model/                  # Data modelleri
-├── internal/config/config.go   # Konfigürasyon
-├── docs/                       # Dokümantasyon
-├── go.mod                      # Go modülü
-└── README.md                   # Bu dosya
+│   ├── handler/handler.go      # HTTP handlers
+│   └── model/                  # Data models
+├── internal/config/config.go   # Configuration
+├── docs/                       # Documentation
+├── go.mod                      # Go module
+└── README.md                   # This file
 ```
 
-## 🧪 Test
+## 🧪 Testing
 
 ```bash
-# Sağlık kontrolü
+# Health check
 curl http://localhost:8080/api/health
 
-# Mesaj gönder
+# Send message
 curl -X POST http://localhost:8080/api/send \
   -H "Content-Type: application/json" \
-  -d '{"message":"Test mesajı","recipient":"test@example.com"}'
+  -d '{"message":"Test message","recipient":"test@example.com"}'
 
-# Hata testi (validation)
+# Error test (validation)
 curl -X POST http://localhost:8080/api/send \
   -H "Content-Type: application/json" \
   -d '{"message":"","recipient":"test@example.com"}'
 ```
 
-## 📈 Örnek Audit Logs
+## 📈 Sample Audit Logs
 
-### Uygulama Başlatma
+### Application Startup
 ```json
-[AUDIT] {"timestamp":"2025-06-15T01:57:27+03:00","event_type":"startup","message":"Gonder uygulaması başlatıldı - Port: 8080","details":{"host":"localhost","log_level":"info","version":"1.0.0"}}
+[AUDIT] {"timestamp":"2025-06-15T01:57:27+03:00","event_type":"startup","message":"Gonder application started - Port: 8080","details":{"host":"localhost","log_level":"info","version":"1.0.0"}}
 ```
 
-### API Çağrısı
+### API Call
 ```json
 [AUDIT] {"timestamp":"2025-06-15T01:57:48+03:00","event_type":"api_call","method":"POST","path":"/api/send","status_code":200,"duration":"2.1ms","message":"POST /api/send - 200","details":{"content_type":"application/json","content_length":75},"remote_addr":"127.0.0.1:45678","user_agent":"curl/7.68.0"}
 ```
 
-### Mesaj Gönderimi
+### Message Sending
 ```json
-[AUDIT] {"timestamp":"2025-06-15T01:57:48+03:00","event_type":"message_sent","message":"Mesaj gönderildi: email -> demo@example.com (ID: msg_1749941868)","details":{"recipient":"demo@example.com","message_type":"email","message_id":"msg_1749941868","success":true,"extra":{"message_length":25,"message_preview":"Audit log demo mesajı"}}}
+[AUDIT] {"timestamp":"2025-06-15T01:57:48+03:00","event_type":"message_sent","message":"Message sent: email -> demo@example.com (ID: msg_1749941868)","details":{"recipient":"demo@example.com","message_type":"email","message_id":"msg_1749941868","success":true,"extra":{"message_length":25,"message_preview":"Audit log demo message"}}}
 ```
 
-### Hata Durumu
+### Error Case
 ```json
 [AUDIT] {"timestamp":"2025-06-15T01:57:48+03:00","event_type":"error","message":"Error in Validation error in Send endpoint: message field is empty","error":"message field is empty","details":{"request":{"message":"","recipient":"demo@example.com","type":"email"}}}
 ```
 
-## 🔧 Geliştirme
+## 🔧 Development
 
 ```bash
-# Test çalıştır
+# Run tests
 go test ./...
 
 # Build
@@ -186,15 +186,15 @@ go vet ./...
 
 ## 📝 TODO
 
-- [ ] Gerçek email gönderme entegrasyonu
-- [ ] SMS gönderme desteği
-- [ ] Database entegrasyonu
+- [ ] Real email sending integration
+- [ ] SMS sending support
+- [ ] Database integration
 - [ ] Authentication & authorization
 - [ ] Rate limiting
 - [ ] Metrics & monitoring
 - [ ] Docker containerization
 - [ ] CI/CD pipeline
 
-## 📄 Lisans
+## 📄 License
 
-Bu proje MIT lisansı altında lisanslanmıştır.
+This project is licensed under the MIT License.

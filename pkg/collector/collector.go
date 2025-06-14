@@ -13,7 +13,7 @@ import (
 	"gonder/pkg/audit"
 )
 
-// LogSource log kaynağı tiplerini tanımlar
+// LogSource defines log source types
 type LogSource string
 
 const (
@@ -25,7 +25,7 @@ const (
 	SourceCustom     LogSource = "custom"
 )
 
-// LogLevel log seviyelerini tanımlar
+// LogLevel defines log levels
 type LogLevel string
 
 const (
@@ -37,7 +37,7 @@ const (
 	LevelUnknown LogLevel = "unknown"
 )
 
-// SystemLog sistem log entry'sini temsil eder
+// SystemLog represents a system log entry
 type SystemLog struct {
 	ID          string                 `json:"id"`
 	Timestamp   time.Time              `json:"timestamp"`
@@ -58,7 +58,7 @@ type SystemLog struct {
 	CollectedAt time.Time              `json:"collected_at"`
 }
 
-// LogCollector log toplama sistemini yönetir
+// LogCollector manages the log collection system
 type LogCollector struct {
 	auditLogger *audit.Logger
 	parsers     map[LogSource]*LogParser
@@ -66,7 +66,7 @@ type LogCollector struct {
 	running     bool
 }
 
-// LogSourceConfig log kaynağı konfigürasyonu
+// LogSourceConfig log source configuration
 type LogSourceConfig struct {
 	Name     string    `json:"name"`
 	Source   LogSource `json:"source"`
@@ -74,17 +74,17 @@ type LogSourceConfig struct {
 	Pattern  string    `json:"pattern,omitempty"`
 	Enabled  bool      `json:"enabled"`
 	Tags     []string  `json:"tags,omitempty"`
-	Interval int       `json:"interval"` // saniye
+	Interval int       `json:"interval"` // seconds
 }
 
-// LogParser log parse edici
+// LogParser log parser
 type LogParser struct {
 	Source  LogSource
 	Pattern *regexp.Regexp
 	Fields  []string
 }
 
-// New yeni bir log collector oluşturur
+// New creates a new log collector
 func New(auditLogger *audit.Logger) *LogCollector {
 	collector := &LogCollector{
 		auditLogger: auditLogger,
@@ -92,16 +92,16 @@ func New(auditLogger *audit.Logger) *LogCollector {
 		running:     false,
 	}
 
-	// Varsayılan parser'ları ekle
+	// Add default parsers
 	collector.initDefaultParsers()
 
-	// Varsayılan log kaynaklarını ekle
+	// Add default log sources
 	collector.initDefaultSources()
 
 	return collector
 }
 
-// initDefaultParsers varsayılan log parser'larını başlatır
+// initDefaultParsers initializes default log parsers
 func (lc *LogCollector) initDefaultParsers() {
 	// Syslog parser
 	syslogPattern := regexp.MustCompile(`^(\w+\s+\d+\s+\d+:\d+:\d+)\s+(\S+)\s+(\S+)(\[\d+\])?\s*:\s*(.*)$`)
@@ -128,9 +128,9 @@ func (lc *LogCollector) initDefaultParsers() {
 	}
 }
 
-// initDefaultSources varsayılan log kaynaklarını başlatır
+// initDefaultSources initializes default log sources
 func (lc *LogCollector) initDefaultSources() {
-	// Çalışma dizinini al
+	// Get working directory
 	workDir, _ := os.Getwd()
 
 	lc.sources = []LogSourceConfig{
@@ -154,7 +154,7 @@ func (lc *LogCollector) initDefaultSources() {
 			Name:     "system_syslog",
 			Source:   SourceSyslog,
 			Path:     "/var/log/syslog",
-			Enabled:  false, // varsayılan olarak kapalı (test ortamında olmayabilir)
+			Enabled:  false, // disabled by default (may not exist in test environment)
 			Tags:     []string{"system", "syslog"},
 			Interval: 5,
 		},
@@ -162,7 +162,7 @@ func (lc *LogCollector) initDefaultSources() {
 			Name:     "system_messages",
 			Source:   SourceSyslog,
 			Path:     "/var/log/messages",
-			Enabled:  false, // varsayılan olarak kapalı
+			Enabled:  false, // disabled by default
 			Tags:     []string{"system", "messages"},
 			Interval: 5,
 		},
@@ -170,7 +170,7 @@ func (lc *LogCollector) initDefaultSources() {
 			Name:     "nginx_access",
 			Source:   SourceNginx,
 			Path:     "/var/log/nginx/access.log",
-			Enabled:  false, // varsayılan olarak kapalı
+			Enabled:  false, // disabled by default
 			Tags:     []string{"web", "nginx", "access"},
 			Interval: 5,
 		},
@@ -178,14 +178,14 @@ func (lc *LogCollector) initDefaultSources() {
 			Name:     "auth_log",
 			Source:   SourceSyslog,
 			Path:     "/var/log/auth.log",
-			Enabled:  false, // varsayılan olarak kapalı
+			Enabled:  false, // disabled by default
 			Tags:     []string{"security", "auth"},
 			Interval: 5,
 		},
 	}
 }
 
-// Start log toplama işlemini başlatır
+// Start begins the log collection process
 func (lc *LogCollector) Start() error {
 	if lc.running {
 		return fmt.Errorf("log collector already running")
@@ -194,7 +194,7 @@ func (lc *LogCollector) Start() error {
 	lc.running = true
 	lc.auditLogger.LogEvent(audit.AuditEvent{
 		EventType: "log_collector_start",
-		Message:   "Sistem log toplama başlatıldı",
+		Message:   "System log collection started",
 		Details: map[string]interface{}{
 			"sources_count": len(lc.sources),
 			"enabled_sources": func() []string {
@@ -209,7 +209,7 @@ func (lc *LogCollector) Start() error {
 		},
 	})
 
-	// Her enabled source için goroutine başlat
+	// Start goroutine for each enabled source
 	for _, source := range lc.sources {
 		if source.Enabled {
 			go lc.collectFromSource(source)
@@ -219,16 +219,16 @@ func (lc *LogCollector) Start() error {
 	return nil
 }
 
-// Stop log toplama işlemini durdurur
+// Stop stops the log collection process
 func (lc *LogCollector) Stop() {
 	lc.running = false
 	lc.auditLogger.LogEvent(audit.AuditEvent{
 		EventType: "log_collector_stop",
-		Message:   "Sistem log toplama durduruldu",
+		Message:   "System log collection stopped",
 	})
 }
 
-// collectFromSource belirli bir kaynaktan log toplar
+// collectFromSource collects logs from a specific source
 func (lc *LogCollector) collectFromSource(config LogSourceConfig) {
 	ticker := time.NewTicker(time.Duration(config.Interval) * time.Second)
 	defer ticker.Stop()
@@ -238,98 +238,66 @@ func (lc *LogCollector) collectFromSource(config LogSourceConfig) {
 	for lc.running {
 		select {
 		case <-ticker.C:
-			// Log dosyasını kontrol et
+			// Check log file
 			if _, err := os.Stat(config.Path); os.IsNotExist(err) {
-				// Dosya yoksa devam et
+				// File doesn't exist, continue
 				continue
 			}
 
-			// Dosyayı aç
+			// Open file
 			file, err := os.Open(config.Path)
 			if err != nil {
-				lc.auditLogger.LogError(err, fmt.Sprintf("log file open error: %s", config.Path), map[string]interface{}{
+				lc.auditLogger.LogError(err, fmt.Sprintf("Failed to open log file: %s", config.Path), map[string]interface{}{
 					"source": config.Name,
 					"path":   config.Path,
 				})
 				continue
 			}
 
-			// Son pozisyondan itibaren oku
-			file.Seek(lastPosition, 0)
-			scanner := bufio.NewScanner(file)
+			// Get file info
+			fileInfo, err := file.Stat()
+			if err != nil {
+				file.Close()
+				continue
+			}
 
-			lineCount := 0
+			// If file is smaller than last position, file might have been rotated
+			if fileInfo.Size() < lastPosition {
+				lastPosition = 0
+			}
+
+			// Seek to last position
+			if _, err := file.Seek(lastPosition, 0); err != nil {
+				file.Close()
+				continue
+			}
+
+			// Read new lines
+			scanner := bufio.NewScanner(file)
 			for scanner.Scan() {
 				line := scanner.Text()
-				if strings.TrimSpace(line) == "" {
-					continue
-				}
-
-				// Log'u parse et ve işle
-				systemLog := lc.parseLogLine(line, config)
-				if systemLog != nil {
+				if systemLog := lc.parseLogLine(line, config); systemLog != nil {
 					lc.processSystemLog(*systemLog)
-					lineCount++
 				}
 			}
 
-			// Yeni pozisyonu kaydet
-			if stat, err := file.Stat(); err == nil {
-				lastPosition = stat.Size()
-			}
+			// Save new position
+			newPosition, _ := file.Seek(0, 1)
+			lastPosition = newPosition
 
 			file.Close()
-
-			if lineCount > 0 {
-				lc.auditLogger.LogEvent(audit.AuditEvent{
-					EventType: "logs_collected",
-					Message:   fmt.Sprintf("%d log entry toplandı: %s", lineCount, config.Name),
-					Details: map[string]interface{}{
-						"source":     config.Name,
-						"path":       config.Path,
-						"line_count": lineCount,
-					},
-				})
-			}
 		}
 	}
 }
 
-// parseLogLine log satırını parse eder
+// parseLogLine parses a log line based on source type
 func (lc *LogCollector) parseLogLine(line string, config LogSourceConfig) *SystemLog {
-	parser, exists := lc.parsers[config.Source]
-	if !exists {
-		// Parser yoksa raw log olarak kaydet
-		return &SystemLog{
-			ID:          fmt.Sprintf("log_%d", time.Now().UnixNano()),
-			Timestamp:   time.Now(),
-			Source:      config.Source,
-			Level:       LevelUnknown,
-			Message:     line,
-			RawLog:      line,
-			Tags:        config.Tags,
-			CollectedAt: time.Now(),
-		}
+	if strings.TrimSpace(line) == "" {
+		return nil
 	}
 
-	matches := parser.Pattern.FindStringSubmatch(line)
-	if matches == nil {
-		// Parse edilemezse raw log olarak kaydet
-		return &SystemLog{
-			ID:          fmt.Sprintf("log_%d", time.Now().UnixNano()),
-			Timestamp:   time.Now(),
-			Source:      config.Source,
-			Level:       LevelUnknown,
-			Message:     line,
-			RawLog:      line,
-			Tags:        config.Tags,
-			CollectedAt: time.Now(),
-		}
-	}
-
-	// Parse edilmiş veriyi SystemLog'a dönüştür
 	systemLog := &SystemLog{
-		ID:          fmt.Sprintf("log_%d", time.Now().UnixNano()),
+		ID:          fmt.Sprintf("log_%d%06d", time.Now().Unix(), time.Now().Nanosecond()/1000),
 		Source:      config.Source,
 		RawLog:      line,
 		Tags:        config.Tags,
@@ -337,19 +305,39 @@ func (lc *LogCollector) parseLogLine(line string, config LogSourceConfig) *Syste
 		ParsedData:  make(map[string]interface{}),
 	}
 
-	// Parser field'larına göre veriyi map'le
+	// If no parser exists, save as raw log
+	parser, exists := lc.parsers[config.Source]
+	if !exists {
+		systemLog.Timestamp = time.Now()
+		systemLog.Message = line
+		systemLog.Level = lc.detectLogLevel(line)
+		return systemLog
+	}
+
+	// Parse with regex
+	matches := parser.Pattern.FindStringSubmatch(line)
+	if matches == nil {
+		// If parsing fails, save as raw log
+		systemLog.Timestamp = time.Now()
+		systemLog.Message = line
+		systemLog.Level = lc.detectLogLevel(line)
+		return systemLog
+	}
+
+	// Convert parsed data to SystemLog
+	systemLog.Timestamp = time.Now() // default
+
+	// Map data to parser fields
 	for i, field := range parser.Fields {
 		if i+1 < len(matches) {
 			value := matches[i+1]
 			systemLog.ParsedData[field] = value
 
-			// Özel field'ları sistemin ilgili alanlarına kopyala
+			// Copy special fields to system's corresponding fields
 			switch field {
 			case "timestamp":
 				if ts, err := lc.parseTimestamp(value); err == nil {
 					systemLog.Timestamp = ts
-				} else {
-					systemLog.Timestamp = time.Now()
 				}
 			case "message":
 				systemLog.Message = value
@@ -375,51 +363,44 @@ func (lc *LogCollector) parseLogLine(line string, config LogSourceConfig) *Syste
 	return systemLog
 }
 
-// processSystemLog sistem log'unu işler
+// processSystemLog processes a system log
 func (lc *LogCollector) processSystemLog(log SystemLog) {
-	// Console'a structured format olarak yaz
+	// Write to console in structured format
 	jsonData, err := json.Marshal(log)
 	if err != nil {
-		lc.auditLogger.LogError(err, "SystemLog JSON marshal error", log)
+		lc.auditLogger.LogError(err, "Failed to marshal system log", map[string]interface{}{
+			"log_id": log.ID,
+		})
 		return
 	}
 
+	// Print to console with SYSTEM_LOG prefix
 	fmt.Printf("[SYSTEM_LOG] %s\n", string(jsonData))
 
-	// Kritik log seviyelerini ayrıca audit log'a yaz
-	if log.Level == LevelError || log.Level == LevelFatal {
-		lc.auditLogger.LogEvent(audit.AuditEvent{
-			EventType: "critical_system_log",
-			Message:   fmt.Sprintf("Kritik sistem log tespit edildi: %s", log.Message),
-			Details: map[string]interface{}{
-				"log_id":      log.ID,
-				"source":      log.Source,
-				"level":       log.Level,
-				"host":        log.Host,
-				"service":     log.Service,
-				"raw_log":     log.RawLog,
-				"parsed_data": log.ParsedData,
-			},
-		})
-	}
+	// Additional processing can be added here
+	// - Database insertion
+	// - Alert checking
+	// - Metric collection
+	// - External system integration
 }
 
-// Yardımcı fonksiyonlar
+// parseTimestamp parses timestamp from log
 func (lc *LogCollector) parseTimestamp(ts string) (time.Time, error) {
-	// Çeşitli timestamp formatlarını dene
+	// Common timestamp formats
 	formats := []string{
 		"Jan 2 15:04:05",
-		"2006-01-02T15:04:05.000Z",
+		"2006-01-02T15:04:05.999999999Z07:00",
+		"2006-01-02T15:04:05Z",
 		"2006-01-02 15:04:05",
-		time.RFC3339,
-		time.RFC822,
+		"02/Jan/2006:15:04:05 -0700",
 	}
 
 	for _, format := range formats {
 		if t, err := time.Parse(format, ts); err == nil {
-			// Yıl yoksa şu anki yılı ekle
+			// If year is missing, use current year
 			if t.Year() == 0 {
-				t = t.AddDate(time.Now().Year(), 0, 0)
+				now := time.Now()
+				t = t.AddDate(now.Year(), 0, 0)
 			}
 			return t, nil
 		}
@@ -428,40 +409,42 @@ func (lc *LogCollector) parseTimestamp(ts string) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("unable to parse timestamp: %s", ts)
 }
 
+// detectLogLevel detects log level from message
 func (lc *LogCollector) detectLogLevel(message string) LogLevel {
-	lowerMsg := strings.ToLower(message)
+	lower := strings.ToLower(message)
 
-	if strings.Contains(lowerMsg, "error") || strings.Contains(lowerMsg, "err") {
-		return LevelError
-	}
-	if strings.Contains(lowerMsg, "warn") || strings.Contains(lowerMsg, "warning") {
-		return LevelWarn
-	}
-	if strings.Contains(lowerMsg, "fatal") || strings.Contains(lowerMsg, "panic") {
+	if strings.Contains(lower, "fatal") || strings.Contains(lower, "panic") {
 		return LevelFatal
 	}
-	if strings.Contains(lowerMsg, "debug") {
+	if strings.Contains(lower, "error") || strings.Contains(lower, "err") {
+		return LevelError
+	}
+	if strings.Contains(lower, "warn") || strings.Contains(lower, "warning") {
+		return LevelWarn
+	}
+	if strings.Contains(lower, "debug") {
 		return LevelDebug
 	}
-	if strings.Contains(lowerMsg, "info") {
+	if strings.Contains(lower, "info") {
 		return LevelInfo
 	}
 
-	return LevelInfo // varsayılan
+	return LevelUnknown
 }
 
+// parseStatusCode parses HTTP status code
 func parseStatusCode(s string) (int, error) {
-	var code int
-	_, err := fmt.Sscanf(s, "%d", &code)
-	return code, err
+	var statusCode int
+	_, err := fmt.Sscanf(s, "%d", &statusCode)
+	return statusCode, err
 }
 
-// GetSources aktif log kaynaklarını döner
+// GetSources returns all log sources
 func (lc *LogCollector) GetSources() []LogSourceConfig {
 	return lc.sources
 }
 
-// IsRunning collector'ın çalışıp çalışmadığını döner
+// IsRunning returns whether collector is running
 func (lc *LogCollector) IsRunning() bool {
 	return lc.running
 }
