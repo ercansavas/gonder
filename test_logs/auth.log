@@ -1,0 +1,7 @@
+Jun 15 08:45:20 server01 sshd[9876]: Accepted publickey for admin from 192.168.1.100 port 52341 ssh2: RSA SHA256:abc123def456
+Jun 15 08:45:21 server01 sudo[9999]: admin : TTY=pts/0 ; PWD=/home/admin ; USER=root ; COMMAND=/bin/systemctl status nginx
+Jun 15 08:45:22 server01 su[8888]: Successful su for root by admin
+Jun 15 08:45:23 server01 sshd[9876]: pam_unix(sshd:session): session opened for user admin by (uid=0)
+Jun 15 08:45:24 server01 login[7777]: ROOT LOGIN on '/dev/tty1'
+Jun 15 08:45:25 server01 sshd[9999]: Failed password for invalid user hacker from 192.168.1.200 port 22 ssh2
+Jun 15 08:45:26 server01 sshd[9999]: Connection closed by invalid user hacker 192.168.1.200 port 22 [preauth] Jun 15 02:05:31 server01 sshd[15678]: Failed password for root from 10.0.0.50 port 22 ssh2

@@ -1,0 +1,9 @@
+Jun 15 08:45:23 server01 systemd[1]: Started nginx.service
+Jun 15 08:45:24 server01 nginx[12345]: server started successfully
+Jun 15 08:45:25 server01 kernel: [  123.456789] CPU0: temperature above threshold, cpu clock throttled
+Jun 15 08:45:26 server01 sshd[9876]: Accepted publickey for admin from 192.168.1.100 port 52341 ssh2
+Jun 15 08:45:27 server01 systemd[1]: Created slice system-getty.slice
+Jun 15 08:45:28 server01 postfix/master[5432]: daemon started -- version 3.4.13, configuration /etc/postfix
+Jun 15 08:45:29 server01 cron[1111]: (root) CMD (run-parts /etc/cron.hourly)
+Jun 15 08:45:30 server01 systemd[1]: Started Update UTMP about System Runlevel Changes Jun 15 02:05:30 server01 nginx[13579]: [error] 403 Forbidden - Access denied to /admin
+Jun 15 02:05:32 server01 kernel: [12345.678] Out of memory: Kill process 9999 (chrome) score 100 or sacrifice child
