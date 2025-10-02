@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+docs/
+
+# Test logs
+test_logs/
+
+# Build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+gonder
+
+# Test files
+*_test.go
+*.test
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+tmp/
