@@ -7,8 +7,6 @@ RUN apk add --no-cache git ca-certificates tzdata
 # Set working directory
 WORKDIR /build
 
-
-
 # Copy go mod files
 COPY go.mod ./
 
